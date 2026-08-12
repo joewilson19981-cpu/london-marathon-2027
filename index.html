@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>London Marathon 2027 - Training Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px; background: #f3f4f6; color: #1f2937;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 2px 0; letter-spacing: -0.01em; }
+  .sub { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .card .label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 4px; }
+  .card .value { font-size: 22px; font-weight: 700; color: #111827; }
+  .card.accent { background: linear-gradient(135deg, #111827, #1f2937); border: none; }
+  .card.accent .label { color: #9ca3af; }
+  .card.accent .value { color: #fff; font-size: 26px; }
+  .card.accent .footer-note { color: #9ca3af; }
+  .section { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .section h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin: 0 0 12px 0; }
+  .chart-box { position: relative; height: 220px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #f0f0f0; }
+  th { color: #6b7280; font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  .caveat { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px;
+             font-size: 12.5px; line-height: 1.5; color: #92400e; margin: 0 0 12px 0; }
+  .pred-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .pred-grid > div { background: #f9fafb; border-radius: 8px; padding: 10px; text-align: center; }
+  .pred-label { display: block; font-size: 11px; color: #6b7280; text-transform: uppercase; }
+  .pred-value { display: block; font-size: 18px; font-weight: 700; margin-top: 2px; }
+  .footer-note { font-size: 11px; color: #9ca3af; margin-top: 8px; }
+  .note { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.5; color: #1e3a8a; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+  .pill.achieved { background: #d1fae5; color: #065f46; }
+  .pill.notyet { background: #f3f4f6; color: #6b7280; }
+  .pill.training { background: #dbeafe; color: #1e40af; }
+  .pill.done { background: #d1fae5; color: #065f46; }
+  .pill.rest { background: #f3f4f6; color: #6b7280; }
+  .pill.tbc { background: #fef3c7; color: #92400e; }
+  .pill.optional { background: #ede9fe; color: #5b21b6; }
+  .muted { color: #9ca3af; }
+  .week-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f9fafb; border-radius: 8px; font-size: 13px; margin-bottom: 6px; gap: 10px; flex-wrap: wrap; }
+  .week-row.today { background: #111827; }
+  .week-row.today > span:first-child { color: #fff; }
+  .week-row.today .footer-note { color: #d1d5db; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid #e5e7eb; }
+  .tab-btn { padding: 10px 18px; border: none; background: none; font-size: 13px; font-weight: 600;
+              color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab-btn:hover { color: #111827; }
+  .tab-btn.active { color: #111827; border-bottom-color: #111827; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .phase-card { background: #fff; border: 1px solid #e5e7eb; border-left: 4px solid #d1d5db; border-radius: 10px;
+                 padding: 14px 16px; margin-bottom: 10px; }
+  .phase-card.current { border-left-color: #111827; background: #f9fafb; }
+  .phase-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .phase-name { font-weight: 700; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>London Marathon 2027</h1>
+  <div class="sub">Race day 25 April 2027 &middot; Training since R001 (3 Aug 2026) &middot; Generated 2026-08-12 (data pulled live via Garmin/Strava MCP in chat)</div>
+
+  <div class="grid">
+    <div class="card accent">
+      <div class="label">Countdown</div>
+      <div class="value">36w 4d</div>
+      <div class="footer-note">256 days total</div>
+    </div>
+    <div class="card"><div class="label">Runs logged</div><div class="value">4</div></div>
+    <div class="card"><div class="label">Total distance</div><div class="value">16.3 km</div></div>
+    <div class="card"><div class="label">Longest run</div><div class="value">4.17 km</div></div>
+    <div class="card"><div class="label">Avg HR</div><div class="value">133</div></div>
+    
+    <div class="card">
+      <div class="label">Weight</div>
+      <div class="value">18 st 11 lb</div>
+      <div class="footer-note">as of 2026-08-12</div>
+    </div>
+    <div class="card">
+      <div class="label">Weight lost</div>
+      <div class="value">0 lb</div>
+      <div class="footer-note">since 2026-08-03</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="overview" onclick="showTab('overview')">Overview</button>
+    <button class="tab-btn" data-tab="training" onclick="showTab('training')">Training</button>
+    <button class="tab-btn" data-tab="recovery" onclick="showTab('recovery')">Recovery</button>
+    <button class="tab-btn" data-tab="progress" onclick="showTab('progress')">Progress</button>
+    <button class="tab-btn" data-tab="plan" onclick="showTab('plan')">Race Plan</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-overview">
+    <div class="section">
+      <h2>Coach status</h2>
+      <div class="note">R004 done, 4.17 km - the farthest session yet - avg HR 135 (no heat factor today, so a genuinely stronger reading than R003's heat-elevated 137). RPE 5/10, comfortable throughout, minor discomfort for a couple of minutes then good recovery, finished strong. This is the first clean session of the block (RPE <=6, no worsening pain), but R003 still had some pain so it's only one - the run/walk ladder needs two consecutive clean sessions before advancing. R005 (tomorrow) is scheduled as an identical repeat, not a progression - if it also comes back clean, R006 moves to the next rung (3:2 x6).</div>
+    </div>
+
+    <div class="section">
+      <h2>This week's plan</h2>
+      
+        <div class="week-row">
+          <span><strong>Mon</strong> 08-10 <span class="pill rest">Rest</span></span>
+          <span class="footer-note" style="margin-top:0;">No training logged.</span>
+        </div>
+        <div class="week-row">
+          <span><strong>Tue</strong> 08-11 <span class="pill rest">Rest</span></span>
+          <span class="footer-note" style="margin-top:0;">No training logged.</span>
+        </div>
+        <div class="week-row today">
+          <span><strong>Wed</strong> 08-12 (today) <span class="pill done">Done</span></span>
+          <span class="footer-note" style="margin-top:0;"><strong>R004</strong> completed - 4.17 km, 9:47 /km, 135 bpm, RPE 5</span>
+        </div>
+        <div class="week-row">
+          <span><strong>Thu</strong> 08-13 <span class="pill training">Training</span></span>
+          <span class="footer-note" style="margin-top:0;">R005 - repeat 2 min run / 2 min walk x 8. Scheduled to Garmin, cooldown fixed to match how you actually finish it. Repeat, not a progression - need a second consecutive clean session before advancing the ladder.</span>
+        </div>
+        <div class="week-row">
+          <span><strong>Fri</strong> 08-14 <span class="pill rest">Rest</span></span>
+          <span class="footer-note" style="margin-top:0;">250-mile drive, then football and beers. No training planned.</span>
+        </div>
+        <div class="week-row">
+          <span><strong>Sat</strong> 08-15 <span class="pill optional">Optional</span></span>
+          <span class="footer-note" style="margin-top:0;">Free until 3pm, then a party. A short easy session possible in the morning if legs are fresh - optional, not required.</span>
+        </div>
+        <div class="week-row">
+          <span><strong>Sun</strong> 08-16 <span class="pill rest">Rest</span></span>
+          <span class="footer-note" style="margin-top:0;">250-mile drive. No training planned.</span>
+        </div>
+      <p class="footer-note">Built from what you tell Claude about your week (driving, work, social plans) plus the current training decision. To push a session to your Garmin calendar/watch, just ask Claude in chat.</p>
+    </div>
+
+    <div class="section">
+      <h2>Warm-up routine</h2>
+      <ol style="font-size:14px; line-height:1.5; margin:0; padding-left:20px;"><li style='margin-bottom:6px;'>2 min brisk walk - get blood flowing first</li><li style='margin-bottom:6px;'>Heel walks - ~20m walking on your heels, toes up (activates the tibialis anterior - directly targets the shin issue)</li><li style='margin-bottom:6px;'>Toe walks - ~20m up on your toes (calf activation, balance)</li><li style='margin-bottom:6px;'>Ankle circles - 10 each direction, each foot</li><li style='margin-bottom:6px;'>Leg swings - 10 each leg, front-to-back and side-to-side (hip mobility)</li><li style='margin-bottom:6px;'>A few walking lunges or high knees - 10-15 steps to prime the legs</li></ol>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-training">
+    <div class="section">
+      <h2>Weekly mileage (since R001)</h2>
+      <div class="chart-box"><canvas id="mileageChart"></canvas></div>
+      <div class="footer-note">Only shows the weeks since marathon training started - expect a single bar until week 2+.</div>
+    </div>
+
+    <div class="section">
+      <h2>Pace &amp; heart rate trend</h2>
+      <div class="chart-box"><canvas id="trendChart"></canvas></div>
+    </div>
+
+    <div class="section">
+      <h2>All runs (since R001)</h2>
+      <table>
+        <tr><th>ID</th><th>Date</th><th>Name</th><th>Distance</th><th>Duration</th><th>Pace</th><th>Avg HR</th><th>RPE</th><th>Pain</th><th>Coach decision</th></tr>
+        
+        <tr>
+          <td>R004</td>
+          <td>2026-08-12</td>
+          <td>Morning Run</td>
+          <td>4.17 km</td>
+          <td>40:47</td>
+          <td>9:47 /km</td>
+          <td>135</td>
+          <td>5</td>
+          <td>Minor discomfort a couple of minutes, resolved, good recovery, finished strong</td>
+          <td class="footer-note">First clean session of the block (RPE 5, no worsening pain). Repeat identical structure for R005 - need a second consecutive clean session before advancing the run/walk ladder to 3:2 x6.</td>
+        </tr>
+        <tr>
+          <td>R003</td>
+          <td>2026-08-09</td>
+          <td>Castle Point - 2x2 8 times</td>
+          <td>4.09 km</td>
+          <td>40:01</td>
+          <td>9:47 /km</td>
+          <td>137</td>
+          <td>6</td>
+          <td>Some, less than R002</td>
+          <td class="footer-note">Hold. Repeat identical structure for R004, contingent on continued shin improvement.</td>
+        </tr>
+        <tr>
+          <td>R002</td>
+          <td>2026-08-05</td>
+          <td>South Ribble - 2x2 8 times</td>
+          <td>4.11 km</td>
+          <td>40:01</td>
+          <td>9:44 /km</td>
+          <td>128</td>
+          <td>6</td>
+          <td>-</td>
+          <td class="footer-note">Do not progress automatically. Reassess shins over 24-48 hours; progress only if walking and daily activity are pain-free.</td>
+        </tr>
+        <tr>
+          <td>R001</td>
+          <td>2026-08-03</td>
+          <td>South Ribble - 2x2 8 times</td>
+          <td>3.93 km</td>
+          <td>40:02</td>
+          <td>10:12 /km</td>
+          <td>132</td>
+          <td>5</td>
+          <td>0</td>
+          <td class="footer-note">Repeat the same run/walk session. Monitor heel stability and next-day soreness.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-recovery">
+    <div class="section">
+      <h2>Recovery: resting HR, sleep score, HRV</h2>
+      <div class="chart-box"><canvas id="recoveryChart"></canvas></div>
+      <table style="margin-top:14px;">
+        <tr><th>Date</th><th>RHR</th><th>Sleep score</th><th>Sleep time</th><th>HRV (ms)</th><th>HRV status</th></tr>
+        
+        <tr>
+          <td>2026-08-12</td>
+          <td>52</td>
+          <td>80</td>
+          <td>6h 54m</td>
+          <td>56</td>
+          <td>UNBALANCED</td>
+        </tr>
+        <tr>
+          <td>2026-08-11</td>
+          <td>50</td>
+          <td>86</td>
+          <td>7h 13m</td>
+          <td>69</td>
+          <td>BALANCED</td>
+        </tr>
+        <tr>
+          <td>2026-08-10</td>
+          <td>56</td>
+          <td>88</td>
+          <td>8h 03m</td>
+          <td>42</td>
+          <td>UNBALANCED</td>
+        </tr>
+        <tr>
+          <td>2026-08-09</td>
+          <td>58</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>2026-08-08</td>
+          <td>58</td>
+          <td>37</td>
+          <td>6h 53m</td>
+          <td>41</td>
+          <td>BALANCED</td>
+        </tr>
+        <tr>
+          <td>2026-08-07</td>
+          <td>57</td>
+          <td>59</td>
+          <td>6h 44m</td>
+          <td>35</td>
+          <td>BALANCED</td>
+        </tr>
+        <tr>
+          <td>2026-08-06</td>
+          <td>52</td>
+          <td>82</td>
+          <td>7h 07m</td>
+          <td>49</td>
+          <td>BALANCED</td>
+        </tr>
+        <tr>
+          <td>2026-08-05</td>
+          <td>50</td>
+          <td>91</td>
+          <td>7h 39m</td>
+          <td>53</td>
+          <td>NONE</td>
+        </tr>
+        <tr>
+          <td>2026-08-04</td>
+          <td>54</td>
+          <td>89</td>
+          <td>8h 04m</td>
+          <td>49</td>
+          <td>NONE</td>
+        </tr>
+        <tr>
+          <td>2026-08-03</td>
+          <td>50</td>
+          <td>-</td>
+          <td>-</td>
+          <td>64</td>
+          <td>NONE</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>VO2max trend</h2>
+      <p class="caveat">Only a couple of data points so far - too sparse to call this a real trend yet. Worth revisiting in a few weeks.</p>
+      <div class="chart-box"><canvas id="vo2Chart"></canvas></div>
+    </div>
+
+    
+        <div class="section">
+          <h2>Garmin race predictions</h2>
+          <p class="caveat">Based on Garmin's current fitness model, which is still working off
+          limited data this early in the block. Not meaningful yet - included for interest,
+          not as a real forecast. Your actual goal is 4:30:00.</p>
+          <p class="caveat">Planned: a dedicated marathon / half / 10K / 5K prediction panel, likely
+          around Dec 2026-Jan 2027 once real race-pace efforts exist (Phase 3, Build). It'll show
+          Garmin's estimate alongside a second one Claude calculates directly from your actual recent
+          race-distance times (e.g. Riegel's formula) - two independent numbers instead of one
+          black-box guess. Known reference point: 5K PB of 33:54, set 24 May 2024 - over 2 years before
+          this block started, so useful as a rough sanity check only, not something to build a current
+          prediction on.</p>
+          <div class="pred-grid">
+            <div><span class="pred-label">5K</span><span class="pred-value">30:08</span></div>
+            <div><span class="pred-label">10K</span><span class="pred-value">1:05:34</span></div>
+            <div><span class="pred-label">Half marathon</span><span class="pred-value">2:32:13</span></div>
+            <div><span class="pred-label">Marathon</span><span class="pred-value">5:49:52</span></div>
+          </div>
+        </div>
+  </div>
+
+  <div class="tab-panel" id="tab-progress">
+    <div class="section">
+      <h2>Milestones</h2>
+      <table>
+        <tr>
+          <td style="font-weight:600;">Official Run #1</td>
+          <td><span class="pill achieved">Achieved</span></td>
+          <td class="footer-note">R001 - 3.92 km run/walk - 3 Aug 2026</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">First efficiency improvement</td>
+          <td><span class="pill achieved">Achieved</span></td>
+          <td class="footer-note">R002 - farther + lower HR than R001 - 5 Aug 2026</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">First continuous 20 min</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">First continuous 5K</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">First parkrun</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">First 10K</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">100 km total</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">First half marathon</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">1 stone lost</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note"></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">London Marathon 2027</td>
+          <td><span class="pill notyet">Not yet</span></td>
+          <td class="footer-note">25 Apr 2027</td>
+        </tr></table>
+    </div>
+
+    <div class="section">
+      <h2>Weight</h2>
+      
+        <table>
+          <tr><th>Date</th><th>Weight</th><th>Note</th></tr>
+          <tr><td>2026-08-03</td><td>18 st 11 lb</td><td class='footer-note'>Starting baseline</td></tr><tr><td>2026-08-05</td><td>18 st 7 lb</td><td class='footer-note'>First Wednesday weigh-in</td></tr><tr><td>2026-08-12</td><td>18 st 11 lb</td><td class='footer-note'>Weigh-in Wednesday - up from last week, roughly back to baseline</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+      <h2>Shoe mileage — Hoka Clifton 9</h2>
+      <div class="grid" style="margin-bottom:0;">
+        <div class="card"><div class="label">Total mileage</div><div class="value">316.3 km</div>
+          <div class="footer-note">300 prior + 16.3 since R001 (~45% of 700km)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-plan">
+    <div class="section">
+      <h2>Race plan: today &rarr; 25 April 2027</h2>
+      <p style="font-size:13px; line-height:1.6; margin:0 0 4px 0;">You're 4 sessions in, still on run/walk intervals, still working through a shin issue that started at R002. At 6'4" and roughly 18.5 stone, you're carrying more load per stride than most first-time marathoners, which is exactly why progression here is paced by pain and RPE rather than the calendar - going out too hard on volume before the shins are genuinely clear is the single biggest risk to this whole plan. 4:30 for a first marathon is a realistic, achievable target on this timeline (about 38 weeks from R001 to race day) provided training stays consistent - it doesn't require the volume or intensity a faster marathon goal would.</p>
+    </div>
+    
+        <div class="phase-card current">
+          <div class="phase-head">
+            <span class="phase-name">Phase 1 - Injury resolution & run/walk base</span>
+            <span class="pill training">Current phase</span>
+          </div>
+          <div class="footer-note" style="margin-top:2px;">Now - shin pain fully resolved (open-ended) &middot; 12-20 km/week</div>
+          <p style="font-size:13px; margin:8px 0 0 0; line-height:1.5;">Run/walk ladder: 2min run/2min walk x8 (R001-R004) -&gt; 3:2 x6 -&gt; 4:2 x5 -&gt; 5:1 x6 -&gt; 8:1 x4 -&gt; continuous running. Each rung keeps total time roughly the same, shifting more of it into running. Advance a rung only once the last 2 sessions were RPE &le;6, no new/worsening shin pain, and next-day soreness cleared within 24h - otherwise hold or drop back a rung. This phase ends when it ends, not on a calendar date.</p>
+        </div>
+        <div class="phase-card">
+          <div class="phase-head">
+            <span class="phase-name">Phase 2 - Base building</span>
+            
+          </div>
+          <div class="footer-note" style="margin-top:2px;">~8-10 weeks once Phase 1 clears (approx. Sept-Nov 2026) &middot; 20-35 km/week</div>
+          <p style="font-size:13px; margin:8px 0 0 0; line-height:1.5;">Run/walk intervals give way to continuous running. First continuous 20 min, first 5K, first 10K land in this phase. 3 runs/week typical, built around your driving and social weeks.</p>
+        </div>
+        <div class="phase-card">
+          <div class="phase-head">
+            <span class="phase-name">Phase 3 - Build</span>
+            
+          </div>
+          <div class="footer-note" style="margin-top:2px;">~10-12 weeks (approx. Dec 2026-Feb 2027) &middot; 35-55 km/week</div>
+          <p style="font-size:13px; margin:8px 0 0 0; line-height:1.5;">Long run grows progressively most weeks (roughly +1-2 km at a time, with easier weeks every 3rd-4th week). First half marathon lands here. Still almost entirely easy effort - this plan is about durability, not speed.</p>
+        </div>
+        <div class="phase-card">
+          <div class="phase-head">
+            <span class="phase-name">Phase 4 - Peak</span>
+            
+          </div>
+          <div class="footer-note" style="margin-top:2px;">~3-4 weeks (approx. March 2027) &middot; 50-60 km/week</div>
+          <p style="font-size:13px; margin:8px 0 0 0; line-height:1.5;">Longest runs of the block, 29-32 km, with some marathon-pace segments practiced late in the long run. Highest-volume weeks of the whole plan.</p>
+        </div>
+        <div class="phase-card">
+          <div class="phase-head">
+            <span class="phase-name">Phase 5 - Taper</span>
+            
+          </div>
+          <div class="footer-note" style="margin-top:2px;">~2-3 weeks (April 2027, into race day 25 Apr) &middot; Dropping to ~25-30% of peak</div>
+          <p style="font-size:13px; margin:8px 0 0 0; line-height:1.5;">Volume falls sharply, a little intensity stays. Goal is arriving fresh, not fit - the fitness is already banked by this point.</p>
+        </div>
+    <div class="footer-note" style="margin-top:4px;">This is the destination, not a locked schedule - individual sessions are still decided week to week from RPE, pain and recovery data. Phase 1's length is injury-gated, so later windows will shift if it runs long or short.</div>
+  </div>
+
+  <div class="footer-note">Re-run <code>python3 dashboard.py</code> any time to refresh this page with the latest Garmin data. Coach notes, next workout and milestones are updated by Claude after each run is logged.</div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector('.tab-btn[data-tab="' + name + '"]').classList.add('active');
+  Object.values(window.__charts || {}).forEach(c => c && c.resize());
+}
+
+window.__charts = {};
+
+window.__charts.mileage = new Chart(document.getElementById('mileageChart'), {
+  type: 'bar',
+  data: {
+    labels: ["2026-W32", "2026-W33"],
+    datasets: [{ label: 'km', data: [12.1, 4.2], backgroundColor: '#111827', borderRadius: 4 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+
+window.__charts.trend = new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: ["R001 (08-03)", "R002 (08-05)", "R003 (08-09)", "R004 (08-12)"],
+    datasets: [
+      { label: 'Pace (min/km, lower=faster)', data: [10.19, 9.74, 9.78, 9.78], borderColor: '#2563eb', backgroundColor: '#2563eb', yAxisID: 'y', tension: 0.25 },
+      { label: 'Avg HR (bpm)', data: [132, 128, 137, 135], borderColor: '#dc2626', backgroundColor: '#dc2626', yAxisID: 'y1', tension: 0.25 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      y: { position: 'left', title: { display: true, text: 'min/km' } },
+      y1: { position: 'right', title: { display: true, text: 'bpm' }, grid: { drawOnChartArea: false } }
+    }
+  }
+});
+
+window.__charts.recovery = new Chart(document.getElementById('recoveryChart'), {
+  type: 'line',
+  data: {
+    labels: ["2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-08", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12"],
+    datasets: [
+      { label: 'RHR', data: [50, 54, 50, 52, 57, 58, 58, 56, 50, 52], borderColor: '#dc2626', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y' },
+      { label: 'Sleep score', data: [null, 89, 91, 82, 59, 37, null, 88, 86, 80], borderColor: '#2563eb', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y1' },
+      { label: 'HRV (ms)', data: [64, 49, 53, 49, 35, 41, null, 42, 69, 56], borderColor: '#16a34a', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      y: { position: 'left' },
+      y1: { position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false } }
+    }
+  }
+});
+
+window.__charts.vo2 = new Chart(document.getElementById('vo2Chart'), {
+  type: 'line',
+  data: {
+    labels: ["2026-08-03"],
+    datasets: [{ label: 'VO2max', data: [45.0], borderColor: '#7c3aed', backgroundColor: 'transparent', tension: 0.3 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false }
+});
+</script>
+</body>
+</html>
