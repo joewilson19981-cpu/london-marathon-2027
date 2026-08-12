@@ -55,7 +55,7 @@ WEEK_PLAN = [
     {"date": "2026-08-10", "day": "Mon", "status": "rest", "summary": "No training logged."},
     {"date": "2026-08-11", "day": "Tue", "status": "rest", "summary": "No training logged."},
     {"date": "2026-08-12", "day": "Wed", "status": "training", "summary": "R004 done - 4.17 km, avg HR 135, little to no pain, felt strong. Farthest session yet."},
-    {"date": "2026-08-13", "day": "Thu", "status": "training", "summary": "R005 - repeat 2 min run / 2 min walk x 8. Scheduled to Garmin, cooldown fixed to match how you actually finish it. Repeat, not a progression - need a second consecutive clean session before advancing the ladder."},
+    {"date": "2026-08-13", "day": "Thu", "status": "training", "summary": "R005 - repeat 2 min run / 2 min walk x 8. Rebuilt on Garmin to match exactly how you run it: 5 min warmup, 7x(run 2/walk 2), a final 2 min run, then a 5 min cooldown - no more Zone 3 alerts either. Repeat, not a progression - need a second consecutive clean session before advancing the ladder."},
     {"date": "2026-08-14", "day": "Fri", "status": "rest", "summary": "250-mile drive, then football and beers. No training planned."},
     {"date": "2026-08-15", "day": "Sat", "status": "optional", "summary": "Free until 3pm, then a party. A short easy session possible in the morning if legs are fresh - optional, not required."},
     {"date": "2026-08-16", "day": "Sun", "status": "rest", "summary": "250-mile drive. No training planned."},
@@ -367,6 +367,8 @@ def fetch_training_status_snapshot(client, today_str):
     raw = safe(client.get_training_status, today_str)
     if not raw:
         return None
+    # Shape varies by account/device; pull out whatever's present rather
+    # than assuming a fixed structure.
     try:
         latest = raw.get("mostRecentTrainingStatus") or raw
         dev_map = latest.get("latestTrainingStatusData") if isinstance(latest, dict) else None
