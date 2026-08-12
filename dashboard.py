@@ -42,8 +42,13 @@ COACH_NOTE = ("R004 done, 4.17 km - the farthest session yet - avg HR 135 (no he
               "recovery, finished strong. This is the first clean session of the block (RPE <=6, "
               "no worsening pain), but R003 still had some pain so it's only one - the run/walk "
               "ladder needs two consecutive clean sessions before advancing. R005 (tomorrow) is "
-              "scheduled as an identical repeat, not a progression - if it also comes back clean, "
-              "R006 moves to the next rung (3:2 x6).")
+              "going off-plan by Joe's choice: a 40 min pyramid session (2-3-4-5-4-3-2 min running "
+              "blocks with short walk breaks) instead of the usual identical repeat, to explore how "
+              "far continuous running can go while staying slow and stopping at any shin discomfort. "
+              "It's a good design - it peaks at 5 min continuous (more than double anything done so "
+              "far) then tapers back down rather than ending on the hardest effort. It doesn't count "
+              "as a ladder rung either way, so the two-consecutive-clean-sessions progression clock "
+              "is still waiting on an actual repeat at R006 or beyond.")
 
 NEXT_WORKOUT_TEXT = ("R004 - repeat 2 min run / 2 min walk x 8, same structure as "
                       "R001-R003, contingent on shins staying clear. 5 min warmup walk beforehand.")
@@ -55,7 +60,7 @@ WEEK_PLAN = [
     {"date": "2026-08-10", "day": "Mon", "status": "rest", "summary": "No training logged."},
     {"date": "2026-08-11", "day": "Tue", "status": "rest", "summary": "No training logged."},
     {"date": "2026-08-12", "day": "Wed", "status": "training", "summary": "R004 done - 4.17 km, avg HR 135, little to no pain, felt strong. Farthest session yet."},
-    {"date": "2026-08-13", "day": "Thu", "status": "training", "summary": "R005 - repeat 2 min run / 2 min walk x 8. Rebuilt on Garmin to match exactly how you run it: 5 min warmup, 7x(run 2/walk 2), a final 2 min run, then a 5 min cooldown - no more Zone 3 alerts either. Repeat, not a progression - need a second consecutive clean session before advancing the ladder."},
+    {"date": "2026-08-13", "day": "Thu", "status": "training", "summary": "R005 - off-plan by choice: a 40 min pyramid session instead of the usual ladder repeat (2-3-4-5-4-3-2 min running blocks with short walk breaks, peaking at 5 min continuous then tapering back down). Slow pace, stop at any shin discomfort. Doesn't count as a ladder rung either way - treated as its own data point, not a repeat of R004."},
     {"date": "2026-08-14", "day": "Fri", "status": "rest", "summary": "250-mile drive, then football and beers. No training planned."},
     {"date": "2026-08-15", "day": "Sat", "status": "optional", "summary": "Free until 3pm, then a party. A short easy session possible in the morning if legs are fresh - optional, not required."},
     {"date": "2026-08-16", "day": "Sun", "status": "rest", "summary": "250-mile drive. No training planned."},
@@ -460,6 +465,7 @@ def render_html(data):
 
     week_labels, week_km = build_weekly_mileage(activities)
 
+    # This week's runs (ISO week, based on the day the script is run)
     today = date.today()
     this_iso = today.isocalendar()[:2]
     week_runs = [r for r in activities
@@ -542,6 +548,7 @@ def render_html(data):
           <td class="footer-note">{m.get('detail','')}</td>
         </tr>""" for m in MILESTONES)
 
+    # Recovery panel: union of dates present in rhr/sleep/hrv, since R001
     recovery_dates = sorted(set(rhr.keys()) | set(sleep.keys()) | set(hrv.keys()))
     recovery_rows = []
     for d in recovery_dates:
@@ -616,6 +623,7 @@ def render_html(data):
     sleep_score_js = json.dumps([row["sleep_score"] for row in recovery_rows])
     hrv_js = json.dumps([row["hrv_last_night"] for row in recovery_rows])
 
+    # Pace & HR trend (chronological, one point per run)
     chrono = sorted(activities, key=lambda r: r["date"])
     trend_labels = json.dumps([f"{r.get('run_id','-')} ({r['date'][5:]})" for r in chrono])
     trend_pace = json.dumps([round((r["duration_s"] / (r["distance_km"] * 60)), 2) if r["duration_s"] and r["distance_km"] else None for r in chrono])
