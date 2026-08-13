@@ -36,22 +36,19 @@ OUTPUT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.ht
 # Garmin/Strava numbers pulled automatically above.
 # ---------------------------------------------------------------------------
 
-COACH_NOTE = ("R004 done, 4.17 km - the farthest session yet - avg HR 135 (no heat factor "
-              "today, so a genuinely stronger reading than R003's heat-elevated 137). RPE 5/10, "
-              "comfortable throughout, minor discomfort for a couple of minutes then good "
-              "recovery, finished strong. This is the first clean session of the block (RPE <=6, "
-              "no worsening pain), but R003 still had some pain so it's only one - the run/walk "
-              "ladder needs two consecutive clean sessions before advancing. R005 (tomorrow) is "
-              "going off-plan by Joe's choice: a 40 min pyramid session (2-3-4-5-4-3-2 min running "
-              "blocks with short walk breaks) instead of the usual identical repeat, to explore how "
-              "far continuous running can go while staying slow and stopping at any shin discomfort. "
-              "It's a good design - it peaks at 5 min continuous (more than double anything done so "
-              "far) then tapers back down rather than ending on the hardest effort. It doesn't count "
-              "as a ladder rung either way, so the two-consecutive-clean-sessions progression clock "
-              "is still waiting on an actual repeat at R006 or beyond.")
+COACH_NOTE = ("R005 done - Joe's own pyramid design (2-3-4-5-4-3-2 min running blocks), executed "
+              "exactly as planned. RPE 4/10, next to no pain - his best-feeling session of the block "
+              "so far. Pace held steady at 8:22-8:32/km across every running block including the "
+              "5-minute peak (more than double any continuous effort before this), only easing "
+              "afterwards from genuine fatigue, not pain. R005 wasn't a standard ladder rung, but a "
+              "clean continuous 5-minute run exceeds what the next rung (3:2 x6) would ever ask, and "
+              "combined with R004 also being clean, that's two consecutive clean sessions - the "
+              "rule's bar to progress. R006 moves to 3 min run / 2 min walk x 6, built and verified "
+              "in Garmin's library, timing to be confirmed with Joe since the rest of this week is "
+              "already blocked out.")
 
-NEXT_WORKOUT_TEXT = ("R004 - repeat 2 min run / 2 min walk x 8, same structure as "
-                      "R001-R003, contingent on shins staying clear. 5 min warmup walk beforehand.")
+NEXT_WORKOUT_TEXT = ("R006 - progress to 3 min run / 2 min walk x 6 (5 min warmup + 5x[3 min run/2 "
+                      "min walk] + 3 min run + 5 min cooldown, ~38 min). Timing TBC with Joe.")
 
 # Full week plan, built from what Joe tells Claude about his week (driving,
 # work, social commitments) plus the current training decision. Rebuilt by
@@ -60,7 +57,7 @@ WEEK_PLAN = [
     {"date": "2026-08-10", "day": "Mon", "status": "rest", "summary": "No training logged."},
     {"date": "2026-08-11", "day": "Tue", "status": "rest", "summary": "No training logged."},
     {"date": "2026-08-12", "day": "Wed", "status": "training", "summary": "R004 done - 4.17 km, avg HR 135, little to no pain, felt strong. Farthest session yet."},
-    {"date": "2026-08-13", "day": "Thu", "status": "training", "summary": "R005 - off-plan by choice: a 40 min pyramid session instead of the usual ladder repeat (2-3-4-5-4-3-2 min running blocks with short walk breaks, peaking at 5 min continuous then tapering back down). Slow pace, stop at any shin discomfort. Doesn't count as a ladder rung either way - treated as its own data point, not a repeat of R004."},
+    {"date": "2026-08-13", "day": "Thu", "status": "training", "summary": "R005 done - 3.94 km pyramid session (2-3-4-5-4-3-2 min blocks), RPE 4, next to no pain. Pace held through the 5-min peak. Best-feeling session of the block - progresses R006 to 3:2 x6."},
     {"date": "2026-08-14", "day": "Fri", "status": "rest", "summary": "250-mile drive, then football and beers. No training planned."},
     {"date": "2026-08-15", "day": "Sat", "status": "optional", "summary": "Free until 3pm, then a party. A short easy session possible in the morning if legs are fresh - optional, not required."},
     {"date": "2026-08-16", "day": "Sun", "status": "rest", "summary": "250-mile drive. No training planned."},
@@ -74,6 +71,7 @@ RUN_NOTES = {
     "2026-08-05": {"run_id": "R002", "rpe": 6, "pain": "-", "decision": "Do not progress automatically. Reassess shins over 24-48 hours; progress only if walking and daily activity are pain-free."},
     "2026-08-09": {"run_id": "R003", "rpe": 6, "pain": "Some, less than R002", "decision": "Hold. Repeat identical structure for R004, contingent on continued shin improvement."},
     "2026-08-12": {"run_id": "R004", "rpe": 5, "pain": "Minor discomfort a couple of minutes, resolved, good recovery, finished strong", "decision": "First clean session of the block (RPE 5, no worsening pain). Repeat identical structure for R005 - need a second consecutive clean session before advancing the run/walk ladder to 3:2 x6."},
+    "2026-08-13": {"run_id": "R005", "rpe": 4, "pain": "Next to no pain", "decision": "Off-plan pyramid session, executed exactly as designed. Pace held through the 5-min peak - harder test than the next rung requires. Combined with R004, that's two consecutive clean sessions: R006 progresses to 3 min run / 2 min walk x 6."},
 }
 
 MILESTONES = [
