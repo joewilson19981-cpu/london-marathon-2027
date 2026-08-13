@@ -66,18 +66,18 @@
 <body>
 <div class="wrap">
   <h1>London Marathon 2027</h1>
-  <div class="sub">Race day 25 April 2027 &middot; Training since R001 (3 Aug 2026) &middot; Generated 2026-08-12 (data pulled live via Garmin/Strava MCP in chat)</div>
+  <div class="sub">Race day 25 April 2027 &middot; Training since R001 (3 Aug 2026) &middot; Generated 2026-08-13 (data pulled live via Garmin/Strava MCP in chat)</div>
 
   <div class="grid">
     <div class="card accent">
       <div class="label">Countdown</div>
-      <div class="value">36w 4d</div>
-      <div class="footer-note">256 days total</div>
+      <div class="value">36w 3d</div>
+      <div class="footer-note">255 days total</div>
     </div>
-    <div class="card"><div class="label">Runs logged</div><div class="value">4</div></div>
-    <div class="card"><div class="label">Total distance</div><div class="value">16.3 km</div></div>
+    <div class="card"><div class="label">Runs logged</div><div class="value">5</div></div>
+    <div class="card"><div class="label">Total distance</div><div class="value">20.2 km</div></div>
     <div class="card"><div class="label">Longest run</div><div class="value">4.17 km</div></div>
-    <div class="card"><div class="label">Avg HR</div><div class="value">133</div></div>
+    <div class="card"><div class="label">Avg HR</div><div class="value">134</div></div>
     
     <div class="card">
       <div class="label">Weight</div>
@@ -102,7 +102,7 @@
   <div class="tab-panel active" id="tab-overview">
     <div class="section">
       <h2>Coach status</h2>
-      <div class="note">R004 done, 4.17 km - the farthest session yet - avg HR 135 (no heat factor today, so a genuinely stronger reading than R003's heat-elevated 137). RPE 5/10, comfortable throughout, minor discomfort for a couple of minutes then good recovery, finished strong. This is the first clean session of the block (RPE <=6, no worsening pain), but R003 still had some pain so it's only one - the run/walk ladder needs two consecutive clean sessions before advancing. R005 (tomorrow) is going off-plan by Joe's choice: a 40 min pyramid session (2-3-4-5-4-3-2 min running blocks with short walk breaks) instead of the usual identical repeat, to explore how far continuous running can go while staying slow and stopping at any shin discomfort. It's a good design - it peaks at 5 min continuous (more than double anything done so far) then tapers back down rather than ending on the hardest effort. It doesn't count as a ladder rung either way, so the two-consecutive-clean-sessions progression clock is still waiting on an actual repeat at R006 or beyond.</div>
+      <div class="note">R005 done - Joe's own pyramid design (2-3-4-5-4-3-2 min running blocks), executed exactly as planned. RPE 4/10, next to no pain - his best-feeling session of the block so far. Pace held steady at 8:22-8:32/km across every running block including the 5-minute peak (more than double any continuous effort before this), only easing afterwards from genuine fatigue, not pain. R005 wasn't a standard ladder rung, but a clean continuous 5-minute run exceeds what the next rung (3:2 x6) would ever ask, and combined with R004 also being clean, that's two consecutive clean sessions - the rule's bar to progress. R006 moves to 3 min run / 2 min walk x 6, built and verified in Garmin's library, timing to be confirmed with Joe since the rest of this week is already blocked out.</div>
     </div>
 
     <div class="section">
@@ -116,13 +116,13 @@
           <span><strong>Tue</strong> 08-11 <span class="pill rest">Rest</span></span>
           <span class="footer-note" style="margin-top:0;">No training logged.</span>
         </div>
-        <div class="week-row today">
-          <span><strong>Wed</strong> 08-12 (today) <span class="pill done">Done</span></span>
+        <div class="week-row">
+          <span><strong>Wed</strong> 08-12 <span class="pill done">Done</span></span>
           <span class="footer-note" style="margin-top:0;"><strong>R004</strong> completed - 4.17 km, 9:47 /km, 135 bpm, RPE 5</span>
         </div>
-        <div class="week-row">
-          <span><strong>Thu</strong> 08-13 <span class="pill training">Training</span></span>
-          <span class="footer-note" style="margin-top:0;">R005 - off-plan by choice: a 40 min pyramid session instead of the usual ladder repeat (2-3-4-5-4-3-2 min running blocks with short walk breaks, peaking at 5 min continuous then tapering back down). Slow pace, stop at any shin discomfort. Doesn't count as a ladder rung either way - treated as its own data point, not a repeat of R004.</span>
+        <div class="week-row today">
+          <span><strong>Thu</strong> 08-13 (today) <span class="pill done">Done</span></span>
+          <span class="footer-note" style="margin-top:0;"><strong>R005</strong> completed - 3.94 km pyramid session, 10:07 /km, 137 bpm, RPE 4</span>
         </div>
         <div class="week-row">
           <span><strong>Fri</strong> 08-14 <span class="pill rest">Rest</span></span>
@@ -161,7 +161,19 @@
       <h2>All runs (since R001)</h2>
       <table>
         <tr><th>ID</th><th>Date</th><th>Name</th><th>Distance</th><th>Duration</th><th>Pace</th><th>Avg HR</th><th>RPE</th><th>Pain</th><th>Coach decision</th></tr>
-        
+
+        <tr>
+          <td>R005</td>
+          <td>2026-08-13</td>
+          <td>South Ribble - R005 - Pyramid 2-3-4-5-4-3-2 min</td>
+          <td>3.94 km</td>
+          <td>39:37</td>
+          <td>10:07 /km</td>
+          <td>137</td>
+          <td>4</td>
+          <td>Next to no pain</td>
+          <td class="footer-note">Off-plan pyramid, executed exactly as designed. Pace held through the 5-min peak - harder test than the next rung requires. Combined with R004, that's two consecutive clean sessions: R006 progresses to 3 min run / 2 min walk x 6.</td>
+        </tr>
         <tr>
           <td>R004</td>
           <td>2026-08-12</td>
@@ -220,7 +232,15 @@
       <div class="chart-box"><canvas id="recoveryChart"></canvas></div>
       <table style="margin-top:14px;">
         <tr><th>Date</th><th>RHR</th><th>Sleep score</th><th>Sleep time</th><th>HRV (ms)</th><th>HRV status</th></tr>
-        
+
+        <tr>
+          <td>2026-08-13</td>
+          <td>57</td>
+          <td>-</td>
+          <td>7h 31m</td>
+          <td>30</td>
+          <td>UNBALANCED</td>
+        </tr>
         <tr>
           <td>2026-08-12</td>
           <td>52</td>
@@ -474,7 +494,7 @@ window.__charts.mileage = new Chart(document.getElementById('mileageChart'), {
   type: 'bar',
   data: {
     labels: ["2026-W32", "2026-W33"],
-    datasets: [{ label: 'km', data: [12.1, 4.2], backgroundColor: '#111827', borderRadius: 4 }]
+    datasets: [{ label: 'km', data: [12.1, 8.1], backgroundColor: '#111827', borderRadius: 4 }]
   },
   options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
 });
@@ -482,10 +502,10 @@ window.__charts.mileage = new Chart(document.getElementById('mileageChart'), {
 window.__charts.trend = new Chart(document.getElementById('trendChart'), {
   type: 'line',
   data: {
-    labels: ["R001 (08-03)", "R002 (08-05)", "R003 (08-09)", "R004 (08-12)"],
+    labels: ["R001 (08-03)", "R002 (08-05)", "R003 (08-09)", "R004 (08-12)", "R005 (08-13)"],
     datasets: [
-      { label: 'Pace (min/km, lower=faster)', data: [10.19, 9.74, 9.78, 9.78], borderColor: '#2563eb', backgroundColor: '#2563eb', yAxisID: 'y', tension: 0.25 },
-      { label: 'Avg HR (bpm)', data: [132, 128, 137, 135], borderColor: '#dc2626', backgroundColor: '#dc2626', yAxisID: 'y1', tension: 0.25 }
+      { label: 'Pace (min/km, lower=faster)', data: [10.19, 9.74, 9.78, 9.78, 10.07], borderColor: '#2563eb', backgroundColor: '#2563eb', yAxisID: 'y', tension: 0.25 },
+      { label: 'Avg HR (bpm)', data: [132, 128, 137, 135, 137], borderColor: '#dc2626', backgroundColor: '#dc2626', yAxisID: 'y1', tension: 0.25 }
     ]
   },
   options: {
@@ -500,11 +520,11 @@ window.__charts.trend = new Chart(document.getElementById('trendChart'), {
 window.__charts.recovery = new Chart(document.getElementById('recoveryChart'), {
   type: 'line',
   data: {
-    labels: ["2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-08", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12"],
+    labels: ["2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-08", "2026-08-09", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13"],
     datasets: [
-      { label: 'RHR', data: [50, 54, 50, 52, 57, 58, 58, 56, 50, 52], borderColor: '#dc2626', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y' },
-      { label: 'Sleep score', data: [null, 89, 91, 82, 59, 37, null, 88, 86, 80], borderColor: '#2563eb', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y1' },
-      { label: 'HRV (ms)', data: [64, 49, 53, 49, 35, 41, null, 42, 69, 56], borderColor: '#16a34a', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y' }
+      { label: 'RHR', data: [50, 54, 50, 52, 57, 58, 58, 56, 50, 52, 57], borderColor: '#dc2626', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y' },
+      { label: 'Sleep score', data: [null, 89, 91, 82, 59, 37, null, 88, 86, 80, null], borderColor: '#2563eb', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y1' },
+      { label: 'HRV (ms)', data: [64, 49, 53, 49, 35, 41, null, 42, 69, 56, 30], borderColor: '#16a34a', backgroundColor: 'transparent', tension: 0.3, yAxisID: 'y' }
     ]
   },
   options: {
